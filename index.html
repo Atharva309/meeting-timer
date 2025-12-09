@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Custom Countdown Timer</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Georgia, serif;
+        background: linear-gradient(to bottom right, #1e1e1e, #4b4c50);
+        color: #f5e96e;
+        text-align: center;
+    }
+
+    h1 {
+        margin-top: 60px;
+        font-size: 40px;
+        letter-spacing: 1px;
+    }
+
+    .timer-container {
+        margin-top: 70px;
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        font-size: 70px;
+        font-weight: bold;
+    }
+
+    .label {
+        font-size: 22px;
+        margin-top: 10px;
+        color: #f5e96e;
+    }
+
+    .controls {
+        margin-top: 50px;
+    }
+
+    button {
+        background: #f5e96e;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 6px;
+        margin: 8px;
+        font-size: 18px;
+        cursor: pointer;
+        color: #333;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #fff2a8;
+    }
+
+    .input-section {
+        margin-top: 30px;
+        color: white;
+    }
+
+    input {
+        width: 70px;
+        padding: 6px;
+        font-size: 18px;
+        border-radius: 4px;
+        border: none;
+        text-align: center;
+    }
+
+</style>
+</head>
+<body>
+
+<h1>PROJXON / Eficens Meeting Timer</h1>
+
+<div class="input-section">
+    Set Timer:
+    <input id="hoursInput" type="number" value="0" min="0"> H
+    <input id="minutesInput" type="number" value="30" min="0"> M
+    <input id="secondsInput" type="number" value="0" min="0"> S
+</div>
+
+<div class="timer-container">
+    <div>
+        <div id="hours">00</div>
+        <div class="label">Hours</div>
+    </div>
+    <div>
+        <div id="minutes">00</div>
+        <div class="label">Minutes</div>
+    </div>
+    <div>
+        <div id="seconds">00</div>
+        <div class="label">Seconds</div>
+    </div>
+</div>
+
+<div class="controls">
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+    <button onclick="endTimer()">End Now</button>
+</div>
+
+<script>
+    let timerInterval;
+    let remainingSeconds = 0;
+    let paused = false;
+
+    function updateDisplay() {
+        let hrs = Math.floor(remainingSeconds / 3600);
+        let mins = Math.floor((remainingSeconds % 3600) / 60);
+        let secs = remainingSeconds % 60;
+
+        document.getElementById("hours").textContent = String(hrs).padStart(2, "0");
+        document.getElementById("minutes").textContent = String(mins).padStart(2, "0");
+        document.getElementById("seconds").textContent = String(secs).padStart(2, "0");
+    }
+
+    function startTimer() {
+        if (!paused) {
+            let h = parseInt(document.getElementById("hoursInput").value) || 0;
+            let m = parseInt(document.getElementById("minutesInput").value) || 0;
+            let s = parseInt(document.getElementById("secondsInput").value) || 0;
+            remainingSeconds = h * 3600 + m * 60 + s;
+        }
+        paused = false;
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (remainingSeconds <= 0) {
+                clearInterval(timerInterval);
+                return;
+            }
+            remainingSeconds--;
+            updateDisplay();
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        paused = true;
+        clearInterval(timerInterval);
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        paused = false;
+        let h = parseInt(document.getElementById("hoursInput").value) || 0;
+        let m = parseInt(document.getElementById("minutesInput").value) || 0;
+        let s = parseInt(document.getElementById("secondsInput").value) || 0;
+        remainingSeconds = h * 3600 + m * 60 + s;
+        updateDisplay();
+    }
+
+    function endTimer() {
+        clearInterval(timerInterval);
+        remainingSeconds = 0;
