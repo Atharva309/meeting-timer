@@ -2,109 +2,82 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Custom Countdown Timer</title>
+<title>Floating Timer Widget</title>
 <style>
     body {
         margin: 0;
-        padding: 0;
-        font-family: Georgia, serif;
-        background: linear-gradient(to bottom right, #1e1e1e, #4b4c50);
+        background: #1e1e1e;
+        height: 200vh;
+        user-select: none; /* Prevent dragging highlighting */
+    }
+
+    .timer-widget {
+        position: fixed;
+        top: 40px;
+        left: 40px;
+        background: #333;
         color: #f5e96e;
+        width: 220px;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        font-family: Arial, sans-serif;
+        z-index: 999999; /* Always on top */
+        cursor: grab;
+    }
+
+    .inputs input {
+        width: 42px;
+        padding: 3px;
+        font-size: 12px;
         text-align: center;
+        border-radius: 5px;
+        border: none;
     }
 
-    h1 {
-        margin-top: 60px;
-        font-size: 40px;
-        letter-spacing: 1px;
-    }
-
-    .timer-container {
-        margin-top: 70px;
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-        font-size: 70px;
+    .timer-display {
+        font-size: 30px;
+        text-align: center;
         font-weight: bold;
-    }
-
-    .label {
-        font-size: 22px;
-        margin-top: 10px;
-        color: #f5e96e;
-    }
-
-    .controls {
-        margin-top: 50px;
+        margin: 8px 0;
     }
 
     button {
-        background: #f5e96e;
-        border: none;
-        padding: 12px 22px;
+        padding: 5px 10px;
+        margin: 2px;
+        font-size: 11px;
         border-radius: 6px;
-        margin: 8px;
-        font-size: 18px;
-        cursor: pointer;
-        color: #333;
-        font-weight: bold;
-        transition: 0.2s;
-    }
-
-    button:hover {
-        background: #fff2a8;
-    }
-
-    .input-section {
-        margin-top: 30px;
-        color: white;
-    }
-
-    input {
-        width: 70px;
-        padding: 6px;
-        font-size: 18px;
-        border-radius: 4px;
         border: none;
-        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+        background: #f5e96e;
+        color: #333;
     }
-
 </style>
 </head>
 <body>
 
-<h1>PROJXON / Eficens Meeting Timer</h1>
+<div class="timer-widget" id="dragWidget">
+    <div style="font-size:16px; font-weight:bold; text-align:center;">Meeting Timer</div>
 
-<div class="input-section">
-    Set Timer:
-    <input id="hoursInput" type="number" value="0" min="0"> H
-    <input id="minutesInput" type="number" value="30" min="0"> M
-    <input id="secondsInput" type="number" value="0" min="0"> S
-</div>
+    <div class="inputs" style="text-align:center; margin-bottom:8px; font-size:12px;">
+        <input id="hoursInput" type="number" value="0" min="0">h
+        <input id="minutesInput" type="number" value="30" min="0">m
+        <input id="secondsInput" type="number" value="0" min="0">s
+    </div>
 
-<div class="timer-container">
-    <div>
-        <div id="hours">00</div>
-        <div class="label">Hours</div>
-    </div>
-    <div>
-        <div id="minutes">00</div>
-        <div class="label">Minutes</div>
-    </div>
-    <div>
-        <div id="seconds">00</div>
-        <div class="label">Seconds</div>
-    </div>
-</div>
+    <div class="timer-display" id="timer">00:00:00</div>
 
-<div class="controls">
-    <button onclick="startTimer()">Start</button>
-    <button onclick="pauseTimer()">Pause</button>
-    <button onclick="resetTimer()">Reset</button>
-    <button onclick="endTimer()">End Now</button>
+    <div style="text-align:center;">
+        <button onclick="startTimer()">Start</button>
+        <button onclick="pauseTimer()">Pause</button><br>
+        <button onclick="resetTimer()">Reset</button>
+        <button onclick="endTimer()">End</button>
+    </div>
 </div>
 
 <script>
+    // TIMER LOGIC
     let timerInterval;
     let remainingSeconds = 0;
     let paused = false;
@@ -113,17 +86,15 @@
         let hrs = Math.floor(remainingSeconds / 3600);
         let mins = Math.floor((remainingSeconds % 3600) / 60);
         let secs = remainingSeconds % 60;
-
-        document.getElementById("hours").textContent = String(hrs).padStart(2, "0");
-        document.getElementById("minutes").textContent = String(mins).padStart(2, "0");
-        document.getElementById("seconds").textContent = String(secs).padStart(2, "0");
+        document.getElementById("timer").textContent =
+            `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     }
 
     function startTimer() {
         if (!paused) {
-            let h = parseInt(document.getElementById("hoursInput").value) || 0;
-            let m = parseInt(document.getElementById("minutesInput").value) || 0;
-            let s = parseInt(document.getElementById("secondsInput").value) || 0;
+            const h = parseInt(hoursInput.value) || 0;
+            const m = parseInt(minutesInput.value) || 0;
+            const s = parseInt(secondsInput.value) || 0;
             remainingSeconds = h * 3600 + m * 60 + s;
         }
         paused = false;
@@ -145,11 +116,11 @@
     }
 
     function resetTimer() {
-        clearInterval(timerInterval);
         paused = false;
-        let h = parseInt(document.getElementById("hoursInput").value) || 0;
-        let m = parseInt(document.getElementById("minutesInput").value) || 0;
-        let s = parseInt(document.getElementById("secondsInput").value) || 0;
+        clearInterval(timerInterval);
+        const h = parseInt(hoursInput.value) || 0;
+        const m = parseInt(minutesInput.value) || 0;
+        const s = parseInt(secondsInput.value) || 0;
         remainingSeconds = h * 3600 + m * 60 + s;
         updateDisplay();
     }
@@ -157,3 +128,21 @@
     function endTimer() {
         clearInterval(timerInterval);
         remainingSeconds = 0;
+        updateDisplay();
+    }
+
+    updateDisplay();
+
+    // DRAGGING LOGIC (FULL FIX)
+    const widget = document.getElementById("dragWidget");
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    widget.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        widget.style.cursor = "grabbing";
+
+        offsetX = e.clientX - widget.offsetLeft;
+        offsetY = e.clientY - widget.offsetTop;
+    });
